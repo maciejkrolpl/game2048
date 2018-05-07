@@ -2,14 +2,16 @@ package com.github.maciejkrolpl.game2048;
 
 import java.util.Random;
 
-/**
- * Klasa przechowująca planszę, czyli obecny stan gry. Nie powinna zarządzać samą rozgrywką, a udostępniać metody
- * pozwalające na wykonanie poszczególnych ruchów.
- */
+
 public class Board {
 
     private int[][] board = new int[4][4];
     private int score = 0;
+    private int maxTile=0;
+
+    public int getMaxTile() {
+        return maxTile;
+    }
 
     public boolean gameContinues() {
 
@@ -46,9 +48,6 @@ public class Board {
 
     boolean isPossibleDownMove() {
 
-        /* szukamy czy dla ruchu w dół możemy
-        1. zmerdżować
-        2. przesunąc w dół (pod jakimkolwiek kafelkiem jest zero*/
 
         int x;
         int y;
@@ -131,19 +130,20 @@ public class Board {
         rotateCounterClockwise();
     }
 
-    public void moveToDown() {
+    public int moveToDown() {
         int x;
         int y;
 
-        for (y = 0; y <= 3; y++) {    // przesuwanie dla każdej kolumny
+        for (y = 0; y <= 3; y++) {
 
 
-            for (x = 3; x > 0; x--) {   // zaczynamy od dołu i szukamy pustych pól
+            for (x = 3; x > 0; x--) {
 
                 boolean isMerged = false;
 
                 if ((board[x][y] != 0) && (board[x - 1][y] == board[x][y])) {
                     board[x][y] *= 2;
+                    maxTile = board[x][y];
                     score += board[x][y];
                     board[x - 1][y] = 0;
                     isMerged = true;
@@ -153,18 +153,15 @@ public class Board {
 
                 if ((!isMerged) && (x < 3) && (board[x + 1][y] == board[x][y])) {
                     board[x + 1][y] *= 2;
+                    maxTile = board[x + 1][y];
                     score += board[x + 1][y];
                     board[x][y] = 0;
                 }
 
                 findEmptyTile(x, y);
-
-
             }
-
-            /*  ************************************************ */
         }
-
+        return maxTile;
     }
 
     private void findEmptyTile(int x, int y) {
@@ -172,7 +169,7 @@ public class Board {
             int searchX = x;
             while (board[searchX][y] == 0 && searchX > 0) {
                 searchX--;
-            }  // znajdujemy pełne
+            }
             board[x][y] = board[searchX][y];
             board[searchX][y] = 0;
         }
